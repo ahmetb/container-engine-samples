@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <title>Simple web server at {{.hostname}}</title>
+  </head>
+  <body>
+    <main class="container">
+      <!-- header -->
+      <div class="jumbotron mt-3">
+        <h1 class="display-3">Hello, world!</h1>
+        <p class="info">
+          This is a simple HTTP web server 
+          {{- if .onGCE}} running on Google Compute Engine{{- end -}}
+        .</p>
+        <hr class="my-4">
+        <p class="info">
+          Hostname: <code>{{.hostname}}</code>
+        </p>
+      </div>
+      <!-- // header -->
+
+      <div class="details">
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <a class="nav-link showEnv active" href="#">Environment</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link showReq" href="#">Request</a>
+          </li>
+          {{ if .onGCE }}
+          <li class="nav-item">
+            <a class="nav-link showGCE" href="#">Instance Metadata</a>
+          </li>
+          {{ end }}
+        </ul>
+
+        <div class="card detail-card env">
+          <div class="card-block">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Key</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{ range $k, $v := .env }}
+                  <tr>
+                    <td scope="row"><nobr><code>{{ $k }}</code></nobr></td>
+                    <td><pre style="white-space: pre-wrap; word-break: break-all;">{{ $v }}</pre></td>
+                  </tr>
+                {{ end }}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card detail-card req" hidden>
+          <div class="card-block">
+            <p class="info">
+              <b>Host:</b> <code>{{ .req.Host }}</code>
+            </p>
+
+            <p class="info">
+              <b>URL:</b> <code>{{ .req.URL }}</code>
+            </p>
+
+            <p class="info">
+              <b>Remote Address:</b> <code>{{ .req.RemoteAddr }}</code>
+            </p>
+
+            <h4 class="card-title">Request Headers</h4>
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{ range $k, $v := .req.Header }}
+                  <tr>
+                    <td scope="row"><nobr><code>{{ $k }}</code></nobr></td>
+                    <td>
+                      {{ if eq (len $v) 1 }}
+                        <pre style="white-space: pre-wrap; word-break: break-all;">{{ index $v 0 }}</pre>
+                      {{ else }}
+                        multiple-values ({{ len $v }})
+                      {{ end }}
+                    </td>
+                  </tr>
+                {{ end }}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card detail-card gce" hidden>
+          <div class="card-block">
+            <h4 class="card-title">Google Compute Instance Metadata</h4>
+
+            <p class="lead">
+              These values are retrieved from the
+              <a
+              href="https://cloud.google.com/compute/docs/storing-retrieving-metadata"
+                  rel="nofollow">instance metadata server</a> as this
+              application is running on a Google Compute Engine (GCE)
+              instance.
+            </p>
+
+            <p class="info">
+              <b>Hostname:</b> <code>{{ .gce.hostname }}</code>
+            </p>
+
+            <p class="info">
+              <b>Project ID:</b> <code>{{ .gce.projectID }}</code>
+            </p>
+
+            <p class="info">
+              <b>Instance Name:</b> <code>{{ .gce.instanceName }}</code>
+            </p>
+
+            <p class="info">
+              <b>Instance ID:</b> <code>{{ .gce.instanceID }}</code>
+            </p>
+
+            <p class="info">
+              <b>Instance Zone:</b> <code>{{ .gce.zone }}</code>
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      $(document).ready(function(){
+        $('a.showEnv').click(function(e){
+          $('.nav-link').removeClass('active');
+          $(this).addClass('active');
+
+          $('.detail-card').attr('hidden','hidden');
+          $('.detail-card.env').removeAttr('hidden');
+          e.preventDefault();
+        });
+
+        $('a.showReq').click(function(e){
+          $('.nav-link').removeClass('active');
+          $(this).addClass('active');
+
+          $('.detail-card').attr('hidden','hidden');
+          $('.detail-card.req').removeAttr('hidden');
+          e.preventDefault();
+        });
+
+        $('a.showGCE').click(function(e){
+          $('.nav-link').removeClass('active');
+          $(this).addClass('active');
+
+          $('.detail-card').attr('hidden','hidden');
+          $('.detail-card.gce').removeAttr('hidden');
+          e.preventDefault();
+        });
+      });
+    </script>
+  </body>
+</html>
