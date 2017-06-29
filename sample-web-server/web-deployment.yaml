@@ -1,0 +1,37 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: hello-web
+  labels:
+    app: hello-web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hello-web 
+  template:
+    metadata:
+      labels:
+        app: hello-web
+    spec:
+      containers:
+      - image: ahmet/web:latest
+        imagePullPolicy: Always
+        name: hello-web
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 100m
+            memory: 50Mi
+        readinessProbe:
+          initialDelaySeconds: 2
+          httpGet:
+            path: "/"
+            port: 8080
+        livenessProbe:
+          httpGet:
+            path: "/"
+            port: 8080
+      terminationGracePeriodSeconds: 5
