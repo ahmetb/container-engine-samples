@@ -51,6 +51,8 @@ func main() {
 }
 
 func htmlHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Connection","close")
+
 	log.Println("handing request on " + r.URL.String())
 	envs := os.Environ()
 	env := make(map[string]string)
