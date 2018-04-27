@@ -1,18 +1,26 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: helloweb
+  name: hello-metrics
   labels:
-    app: hello
+    app: hello-metrics
 spec:
   template:
     metadata:
+      annotations:
+        prometheus.io/scrape: "true"
       labels:
-        app: hello
-        tier: web
+        app: hello-metrics
     spec:
       containers:
       - name: hello-app
-        image: gcr.io/google-samples/hello-app:1.0
+        image: gcr.io/google-samples/hello-app-metrics:1.0
         ports:
         - containerPort: 8080
+        resources:
+          requests:
+            cpu: 100m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
